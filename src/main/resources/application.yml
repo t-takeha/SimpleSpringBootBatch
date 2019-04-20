@@ -1,0 +1,39 @@
+# デバッグモード
+debug: false
+
+illegal-access: debug
+
+# Springの設定
+spring:
+  batch:
+    job:
+      # デフォルトでは、Springは存在するジョブをすべて実行してしまうため、それを止める設定を入れる
+      enabled: false
+      # 特定のジョブだけ実行する方法
+      #names: job1x
+      # メタデータを作成させない
+    initialize-schema: never
+    # データソースの設定（Oracle18c express Edition + HikariCP + Mybatisを使用する）
+  datasource:
+    driverClassName: oracle.jdbc.OracleDriver
+    url: jdbc:oracle:thin:@//localhost:1521/xepdb1
+    username: MYTEST
+    password: MYTEST
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari.maximum-pool-size: 2
+    hikari.minimum-idle: 20
+
+# MyBatisの設定
+mybatis:
+  configuration:
+    default-fetch-size: 10
+    default-statement-timeout: 30
+#  mapper-locations: classpath*:/com/example/ssbb/mapper/*.xml
+
+# ロガー設定
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG
+

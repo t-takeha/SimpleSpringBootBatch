@@ -1,0 +1,70 @@
+plugins {
+	id 'java'
+	id 'application'
+	id 'maven'
+	id 'eclipse'
+	// bootjarを作るため
+	id 'org.springframework.boot' version '2.1.4.RELEASE'
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+sourceCompatibility = '11'
+def projectEncoding = 'UTF-8'
+
+compileJava {
+	options.encoding = 'UTF-8'
+}
+
+/* メインクラス */
+mainClassName = 'com.example.ssbb.SimpleBatchApplication'
+
+/* XMLファイルをjarに含める */
+jar {
+    duplicatesStrategy= DuplicatesStrategy.EXCLUDE
+    from('src/main/java') {
+      include '**/*.class'
+    }
+    from('src/main/resources') {
+      include '**/*.xml'
+      include '**/*.yml'
+      include '**/*.properties'
+    }
+}
+//sourceSets.main.resources { srcDirs = ["src/main/resources"]; include "**/*.*" }
+
+configurations {
+	all*.exclude module:'spring-boot-starter-logging'
+}
+
+dependencies {
+
+	// ツール関連
+	implementation 'org.springframework.boot:spring-boot-devtools:latest.release'
+	runtimeOnly 'org.springframework.boot:spring-boot-devtools'
+	implementation 'org.springframework.boot:spring-boot-gradle-plugin:latest.release'
+
+	// Spring
+	implementation 'org.springframework.boot:spring-boot-dependencies:latest.release'
+	implementation 'org.springframework.boot:spring-boot-starter:latest.release'
+	implementation 'org.springframework.boot:spring-boot-starter-aop:latest.release'
+	implementation 'org.springframework.boot:spring-boot-starter-log4j2:latest.release'
+	implementation 'org.springframework.boot:spring-boot-starter-jta-atomikos:latest.release'
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc:latest.release'
+	implementation 'org.springframework.boot:spring-boot-starter-batch:latest.release'
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:latest.release'
+	compile files('lib/ojdbc8.jar')
+	compile files('lib/oraclepki.jar')
+	compile files('lib/osdt_cert.jar')
+	compile files('lib/osdt_core.jar')
+
+	// Test
+	testImplementation 'org.springframework.boot:spring-boot-starter-test:latest.release'
+	testImplementation 'org.springframework.batch:spring-batch-test:latest.release'
+}
+
