@@ -1,0 +1,492 @@
+##### ジョブ管理テーブルの初期化ありの場合（初期起動）#####
+
+
+### START SimpleBatchApplication
+### START SimpleBatchApplication
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::        (v2.1.4.RELEASE)
+
+2019-04-23 00:03:56.656  INFO 13184 --- [  restartedMain] c.e.s.SimpleBatchApplication             : Starting SimpleBatchApplication on DESKTOP-S7E5EAQ with PID 13184 (D:\work\git\SimpleSpringBootBatch\bin\main started by t-tak in D:\work\git\SimpleSpringBootBatch)
+2019-04-23 00:03:56.659  INFO 13184 --- [  restartedMain] c.e.s.SimpleBatchApplication             : No active profile set, falling back to default profiles: default
+2019-04-23 00:03:56.718  INFO 13184 --- [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2019-04-23 00:03:58.118  WARN 13184 --- [  restartedMain] o.s.b.c.c.a.DefaultBatchConfigurer       : No transaction manager was provided, using a DataSourceTransactionManager
+2019-04-23 00:03:58.189 DEBUG 13184 --- [  restartedMain] o.s.j.d.DataSourceUtils                  : Fetching JDBC Connection from DataSource
+2019-04-23 00:03:58.192  INFO 13184 --- [  restartedMain] c.z.h.HikariDataSource                   : HikariPool-1 - Starting...
+2019-04-23 00:03:58.991  INFO 13184 --- [  restartedMain] c.z.h.HikariDataSource                   : HikariPool-1 - Start completed.
+2019-04-23 00:03:59.004  INFO 13184 --- [  restartedMain] o.s.b.c.r.s.JobRepositoryFactoryBean     : No database type set, using meta data indicating: ORACLE
+2019-04-23 00:03:59.280  INFO 13184 --- [  restartedMain] o.s.b.c.l.s.SimpleJobLauncher            : No TaskExecutor has been set, defaulting to synchronous executor.
+### listener ###
+### job = executeStoredJob ###
+2019-04-23 00:03:59.845 DEBUG 13184 --- [  restartedMain] o.s.j.d.DataSourceUtils                  : Fetching JDBC Connection from DataSource
+2019-04-23 00:03:59.856 DEBUG 13184 --- [  restartedMain] o.s.j.d.DataSourceUtils                  : Fetching JDBC Connection from DataSource
+2019-04-23 00:03:59.858 DEBUG 13184 --- [  restartedMain] o.s.j.d.i.ScriptUtils                    : Executing SQL script from class path resource [org/springframework/batch/core/schema-oracle10g.sql]
+2019-04-23 00:04:00.651 DEBUG 13184 --- [  restartedMain] o.s.j.d.i.ScriptUtils                    : 0 returned as update count for SQL: CREATE TABLE BATCH_JOB_INSTANCE ( JOB_INSTANCE_ID NUMBER(19,0) NOT NULL PRIMARY KEY , VERSION NUMBER(19,0) , JOB_NAME VARCHAR2(100 char) NOT NULL, JOB_KEY VARCHAR2(32 char) NOT NULL, constraint JOB_INST_UN unique (JOB_NAME, JOB_KEY) ) 
+2019-04-23 00:04:00.669 DEBUG 13184 --- [  restartedMain] o.s.j.d.i.ScriptUtils                    : 0 returned as update count for SQL: CREATE TABLE BATCH_JOB_EXECUTION ( JOB_EXECUTION_ID NUMBER(19,0) NOT NULL PRIMARY KEY , VERSION NUMBER(19,0) , JOB_INSTANCE_ID NUMBER(19,0) NOT NULL, CREATE_TIME TIMESTAMP NOT NULL, START_TIME TIMESTAMP DEFAULT NULL , END_TIME TIMESTAMP DEFAULT NULL , STATUS VARCHAR2(10 char) , EXIT_CODE VARCHAR2(2500 char) , EXIT_MESSAGE VARCHAR2(2500 char) , LAST_UPDATED TIMESTAMP, JOB_CONFIGURATION_LOCATION VARCHAR(2500 char) NULL, constraint JOB_INST_EXEC_FK foreign key (JOB_INSTANCE_ID) references BATCH_JOB_INSTANCE(JOB_INSTANCE_ID) ) 
+2019-04-23 00:04:00.680 DEBUG 13184 --- [  restartedMain] o.s.j.d.i.ScriptUtils                    : 0 returned as update count for SQL: CREATE TABLE BATCH_JOB_EXECUTION_PARAMS ( JOB_EXECUTION_ID NUMBER(19,0) NOT NULL , TYPE_CD VARCHAR2(6 char) NOT NULL , KEY_NAME VARCHAR2(100 char) NOT NULL , STRING_VAL VARCHAR2(250 char) , DATE_VAL TIMESTAMP DEFAULT NULL , LONG_VAL NUMBER(19,0) , DOUBLE_VAL NUMBER , IDENTIFYING CHAR(1) NOT NULL , constraint JOB_EXEC_PARAMS_FK foreign key (JOB_EXECUTION_ID) references BATCH_JOB_EXECUTION(JOB_EXECUTION_ID) ) 
+2019-04-23 00:04:00.707 DEBUG 13184 --- [  restartedMain] o.s.j.d.i.ScriptUtils                    : 0 returned as update count for SQL: CREATE TABLE BATCH_STEP_EXECUTION ( STEP_EXECUTION_ID NUMBER(19,0) NOT NULL PRIMARY KEY , VERSION NUMBER(19,0) NOT NULL, STEP_NAME VARCHAR2(100 char) NOT NULL, JOB_EXECUTION_ID NUMBER(19,0) NOT NULL, START_TIME TIMESTAMP NOT NULL , END_TIME TIMESTAMP DEFAULT NULL , STATUS VARCHAR2(10 char) , COMMIT_COUNT NUMBER(19,0) , READ_COUNT NUMBER(19,0) , FILTER_COUNT NUMBER(19,0) , WRITE_COUNT NUMBER(19,0) , READ_SKIP_COUNT NUMBER(19,0) , WRITE_SKIP_COUNT NUMBER(19,0) , PROCESS_SKIP_COUNT NUMBER(19,0) , ROLLBACK_COUNT NUMBER(19,0) , EXIT_CODE VARCHAR2(2500 char) , EXIT_MESSAGE VARCHAR2(2500 char) , LAST_UPDATED TIMESTAMP, constraint JOB_EXEC_STEP_FK foreign key (JOB_EXECUTION_ID) references BATCH_JOB_EXECUTION(JOB_EXECUTION_ID) ) 
+2019-04-23 00:04:00.729 DEBUG 13184 --- [  restartedMain] o.s.j.d.i.ScriptUtils                    : 0 returned as update count for SQL: CREATE TABLE BATCH_STEP_EXECUTION_CONTEXT ( STEP_EXECUTION_ID NUMBER(19,0) NOT NULL PRIMARY KEY, SHORT_CONTEXT VARCHAR2(2500 char) NOT NULL, SERIALIZED_CONTEXT CLOB , constraint STEP_EXEC_CTX_FK foreign key (STEP_EXECUTION_ID) references BATCH_STEP_EXECUTION(STEP_EXECUTION_ID) ) 
+2019-04-23 00:04:00.745 DEBUG 13184 --- [  restartedMain] o.s.j.d.i.ScriptUtils                    : 0 returned as update count for SQL: CREATE TABLE BATCH_JOB_EXECUTION_CONTEXT ( JOB_EXECUTION_ID NUMBER(19,0) NOT NULL PRIMARY KEY, SHORT_CONTEXT VARCHAR2(2500 char) NOT NULL, SERIALIZED_CONTEXT CLOB , constraint JOB_EXEC_CTX_FK foreign key (JOB_EXECUTION_ID) references BATCH_JOB_EXECUTION(JOB_EXECUTION_ID) ) 
+2019-04-23 00:04:00.866 DEBUG 13184 --- [  restartedMain] o.s.j.d.i.ScriptUtils                    : 0 returned as update count for SQL: CREATE SEQUENCE BATCH_STEP_EXECUTION_SEQ START WITH 0 MINVALUE 0 MAXVALUE 9223372036854775807 NOCYCLE
+2019-04-23 00:04:00.868 DEBUG 13184 --- [  restartedMain] o.s.j.d.i.ScriptUtils                    : 0 returned as update count for SQL: CREATE SEQUENCE BATCH_JOB_EXECUTION_SEQ START WITH 0 MINVALUE 0 MAXVALUE 9223372036854775807 NOCYCLE
+2019-04-23 00:04:00.871 DEBUG 13184 --- [  restartedMain] o.s.j.d.i.ScriptUtils                    : 0 returned as update count for SQL: CREATE SEQUENCE BATCH_JOB_SEQ START WITH 0 MINVALUE 0 MAXVALUE 9223372036854775807 NOCYCLE
+2019-04-23 00:04:00.872 DEBUG 13184 --- [  restartedMain] o.s.j.d.i.ScriptUtils                    : Executed SQL script from class path resource [org/springframework/batch/core/schema-oracle10g.sql] in 1013 ms.
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.springframework.cglib.core.ReflectUtils (file:/C:/Users/t-tak/.gradle/caches/modules-2/files-2.1/org.springframework/spring-core/5.1.6.RELEASE/9329591e728ef9844911e082e399f4fc3e3ecb37/spring-core-5.1.6.RELEASE.jar) to method java.lang.ClassLoader.defineClass(java.lang.String,byte[],int,int,java.security.ProtectionDomain)
+WARNING: Please consider reporting this to the maintainers of org.springframework.cglib.core.ReflectUtils
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+2019-04-23 00:04:01.075  INFO 13184 --- [  restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2019-04-23 00:04:01.109  INFO 13184 --- [  restartedMain] c.e.s.SimpleBatchApplication             : Started SimpleBatchApplication in 5.119 seconds (JVM running for 6.401)
+2019-04-23 00:04:01.111  INFO 13184 --- [  restartedMain] o.s.b.a.b.JobLauncherCommandLineRunner   : Running default command line with: [--spring.batch.job.enabled=true, --spring.batch.job.names=executeStoredJob]
+2019-04-23 00:04:01.117 DEBUG 13184 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Creating new transaction with name [org.springframework.batch.core.repository.support.SimpleJobRepository.isJobInstanceExists]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+2019-04-23 00:04:01.119 DEBUG 13184 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Acquired Connection [HikariProxyConnection@1433140270 wrapping oracle.jdbc.driver.T4CConnection@484e07f5] for JDBC transaction
+2019-04-23 00:04:01.124 DEBUG 13184 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:04:01.125 DEBUG 13184 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT JOB_INSTANCE_ID, JOB_NAME from BATCH_JOB_INSTANCE where JOB_NAME = ? and JOB_KEY = ?]
+2019-04-23 00:04:01.288 DEBUG 13184 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Initiating transaction commit
+2019-04-23 00:04:01.288 DEBUG 13184 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Committing JDBC transaction on Connection [HikariProxyConnection@1433140270 wrapping oracle.jdbc.driver.T4CConnection@484e07f5]
+2019-04-23 00:04:01.291 DEBUG 13184 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Releasing JDBC Connection [HikariProxyConnection@1433140270 wrapping oracle.jdbc.driver.T4CConnection@484e07f5] after transaction
+2019-04-23 00:04:01.292 DEBUG 13184 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:04:01.292 DEBUG 13184 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT JOB_INSTANCE_ID, JOB_NAME from BATCH_JOB_INSTANCE where JOB_NAME = ? order by JOB_INSTANCE_ID desc]
+2019-04-23 00:04:01.292 DEBUG 13184 --- [  restartedMain] o.s.j.d.DataSourceUtils                  : Fetching JDBC Connection from DataSource
+2019-04-23 00:04:01.351 DEBUG 13184 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Creating new transaction with name [org.springframework.batch.core.repository.support.SimpleJobRepository.getLastJobExecution]: PROPAGATION_REQUIRES_NEW,ISOLATION_SERIALIZABLE
+2019-04-23 00:04:01.351 DEBUG 13184 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Acquired Connection [HikariProxyConnection@1437831644 wrapping oracle.jdbc.driver.T4CConnection@484e07f5] for JDBC transaction
+2019-04-23 00:04:01.351 DEBUG 13184 --- [  restartedMain] o.s.j.d.DataSourceUtils                  : Changing isolation level of JDBC Connection [HikariProxyConnection@1437831644 wrapping oracle.jdbc.driver.T4CConnection@484e07f5] to 8
+2019-04-23 00:04:01.353 DEBUG 13184 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:04:01.353 DEBUG 13184 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT JOB_INSTANCE_ID, JOB_NAME from BATCH_JOB_INSTANCE where JOB_NAME = ? and JOB_KEY = ?]
+2019-04-23 00:04:01.354 DEBUG 13184 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Initiating transaction commit
+2019-04-23 00:04:01.354 DEBUG 13184 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Committing JDBC transaction on Connection [HikariProxyConnection@1437831644 wrapping oracle.jdbc.driver.T4CConnection@484e07f5]
+2019-04-23 00:04:01.355 DEBUG 13184 --- [  restartedMain] o.s.j.d.DataSourceUtils                  : Resetting isolation level of JDBC Connection [HikariProxyConnection@1437831644 wrapping oracle.jdbc.driver.T4CConnection@484e07f5] to 2
+2019-04-23 00:04:01.356 DEBUG 13184 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Releasing JDBC Connection [HikariProxyConnection@1437831644 wrapping oracle.jdbc.driver.T4CConnection@484e07f5] after transaction
+2019-04-23 00:04:01.356 DEBUG 13184 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Creating new transaction with name [org.springframework.batch.core.repository.support.SimpleJobRepository.createJobExecution]: PROPAGATION_REQUIRES_NEW,ISOLATION_SERIALIZABLE
+2019-04-23 00:04:01.356 DEBUG 13184 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Acquired Connection [HikariProxyConnection@1436976055 wrapping oracle.jdbc.driver.T4CConnection@484e07f5] for JDBC transaction
+2019-04-23 00:04:01.357 DEBUG 13184 --- [  restartedMain] o.s.j.d.DataSourceUtils                  : Changing isolation level of JDBC Connection [HikariProxyConnection@1436976055 wrapping oracle.jdbc.driver.T4CConnection@484e07f5] to 8
+2019-04-23 00:04:01.358 DEBUG 13184 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:04:01.358 DEBUG 13184 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT JOB_INSTANCE_ID, JOB_NAME from BATCH_JOB_INSTANCE where JOB_NAME = ? and JOB_KEY = ?]
+2019-04-23 00:04:01.359 DEBUG 13184 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:04:01.359 DEBUG 13184 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT JOB_INSTANCE_ID, JOB_NAME from BATCH_JOB_INSTANCE where JOB_NAME = ? and JOB_KEY = ?]
+2019-04-23 00:04:01.365 DEBUG 13184 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL update
+2019-04-23 00:04:01.366 DEBUG 13184 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [INSERT into BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION) values (?, ?, ?, ?)]
+2019-04-23 00:04:01.544 DEBUG 13184 --- [  restartedMain] o.s.j.s.SQLErrorCodesFactory             : Looking up default SQLErrorCodes for DataSource [com.zaxxer.hikari.HikariDataSource@43b95aa3]
+2019-04-23 00:04:01.545 DEBUG 13184 --- [  restartedMain] o.s.j.s.SQLErrorCodesFactory             : SQL error codes for 'Oracle' found
+2019-04-23 00:04:01.545 DEBUG 13184 --- [  restartedMain] o.s.j.s.SQLErrorCodesFactory             : Caching SQL error codes for DataSource [com.zaxxer.hikari.HikariDataSource@43b95aa3]: database product name is 'Oracle'
+2019-04-23 00:04:01.546 DEBUG 13184 --- [  restartedMain] s.j.s.SQLErrorCodeSQLExceptionTranslator : Translating SQLException with SQL state '72000', error code '8177', message [ORA-08177: このトランザクションのアクセスをシリアル化できません
+]; SQL was [INSERT into BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION) values (?, ?, ?, ?)] for task [PreparedStatementCallback]
+2019-04-23 00:04:01.546 DEBUG 13184 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Initiating transaction rollback
+2019-04-23 00:04:01.547 DEBUG 13184 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Rolling back JDBC transaction on Connection [HikariProxyConnection@1436976055 wrapping oracle.jdbc.driver.T4CConnection@484e07f5]
+2019-04-23 00:04:01.551 DEBUG 13184 --- [  restartedMain] o.s.j.d.DataSourceUtils                  : Resetting isolation level of JDBC Connection [HikariProxyConnection@1436976055 wrapping oracle.jdbc.driver.T4CConnection@484e07f5] to 2
+2019-04-23 00:04:01.554 DEBUG 13184 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Releasing JDBC Connection [HikariProxyConnection@1436976055 wrapping oracle.jdbc.driver.T4CConnection@484e07f5] after transaction
+2019-04-23 00:04:01.558  INFO 13184 --- [  restartedMain] ConditionEvaluationReportLoggingListener : 
+
+Error starting ApplicationContext. To display the conditions report re-run your application with 'debug' enabled.
+2019-04-23 00:04:01.560 ERROR 13184 --- [  restartedMain] o.s.b.SpringApplication                  : Application run failed
+
+java.lang.IllegalStateException: Failed to execute CommandLineRunner
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:816) [spring-boot-2.1.4.RELEASE.jar:2.1.4.RELEASE]
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:797) [spring-boot-2.1.4.RELEASE.jar:2.1.4.RELEASE]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:324) [spring-boot-2.1.4.RELEASE.jar:2.1.4.RELEASE]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1260) [spring-boot-2.1.4.RELEASE.jar:2.1.4.RELEASE]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1248) [spring-boot-2.1.4.RELEASE.jar:2.1.4.RELEASE]
+	at com.example.ssbb.SimpleBatchApplication.main(SimpleBatchApplication.java:17) [main/:?]
+	at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:?]
+	at jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[?:?]
+	at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:?]
+	at java.lang.reflect.Method.invoke(Method.java:566) ~[?:?]
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:49) [spring-boot-devtools-2.1.4.RELEASE.jar:2.1.4.RELEASE]
+Caused by: org.springframework.dao.CannotSerializeTransactionException: PreparedStatementCallback; SQL [INSERT into BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION) values (?, ?, ?, ?)]; ORA-08177: このトランザクションのアクセスをシリアル化できません
+; nested exception is java.sql.SQLException: ORA-08177: このトランザクションのアクセスをシリアル化できません
+
+	at org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator.doTranslate(SQLErrorCodeSQLExceptionTranslator.java:270) ~[spring-jdbc-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:72) ~[spring-jdbc-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1442) ~[spring-jdbc-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:632) ~[spring-jdbc-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:861) ~[spring-jdbc-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:916) ~[spring-jdbc-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:921) ~[spring-jdbc-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.batch.core.repository.dao.JdbcJobInstanceDao.createJobInstance(JdbcJobInstanceDao.java:117) ~[spring-batch-core-4.1.2.RELEASE.jar:4.1.2.RELEASE]
+	at org.springframework.batch.core.repository.support.SimpleJobRepository.createJobExecution(SimpleJobRepository.java:141) ~[spring-batch-core-4.1.2.RELEASE.jar:4.1.2.RELEASE]
+	at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:?]
+	at jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[?:?]
+	at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:?]
+	at java.lang.reflect.Method.invoke(Method.java:566) ~[?:?]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:198) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:294) ~[spring-tx-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:98) ~[spring-tx-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.batch.core.repository.support.AbstractJobRepositoryFactoryBean$1.invoke(AbstractJobRepositoryFactoryBean.java:181) ~[spring-batch-core-4.1.2.RELEASE.jar:4.1.2.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:212) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at com.sun.proxy.$Proxy63.createJobExecution(Unknown Source) ~[?:?]
+	at org.springframework.batch.core.launch.support.SimpleJobLauncher.run(SimpleJobLauncher.java:134) ~[spring-batch-core-4.1.2.RELEASE.jar:4.1.2.RELEASE]
+	at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:?]
+	at jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[?:?]
+	at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:?]
+	at java.lang.reflect.Method.invoke(Method.java:566) ~[?:?]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:198) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.batch.core.configuration.annotation.SimpleBatchConfiguration$PassthruAdvice.invoke(SimpleBatchConfiguration.java:127) ~[spring-batch-core-4.1.2.RELEASE.jar:4.1.2.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:212) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at com.sun.proxy.$Proxy72.run(Unknown Source) ~[?:?]
+	at org.springframework.boot.autoconfigure.batch.JobLauncherCommandLineRunner.execute(JobLauncherCommandLineRunner.java:214) ~[spring-boot-autoconfigure-2.1.4.RELEASE.jar:2.1.4.RELEASE]
+	at org.springframework.boot.autoconfigure.batch.JobLauncherCommandLineRunner.executeLocalJobs(JobLauncherCommandLineRunner.java:186) ~[spring-boot-autoconfigure-2.1.4.RELEASE.jar:2.1.4.RELEASE]
+	at org.springframework.boot.autoconfigure.batch.JobLauncherCommandLineRunner.launchJobFromProperties(JobLauncherCommandLineRunner.java:172) ~[spring-boot-autoconfigure-2.1.4.RELEASE.jar:2.1.4.RELEASE]
+	at org.springframework.boot.autoconfigure.batch.JobLauncherCommandLineRunner.run(JobLauncherCommandLineRunner.java:166) ~[spring-boot-autoconfigure-2.1.4.RELEASE.jar:2.1.4.RELEASE]
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:813) ~[spring-boot-2.1.4.RELEASE.jar:2.1.4.RELEASE]
+	... 10 more
+Caused by: java.sql.SQLException: ORA-08177: このトランザクションのアクセスをシリアル化できません
+
+	at oracle.jdbc.driver.T4CTTIoer11.processError(T4CTTIoer11.java:494) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.T4CTTIoer11.processError(T4CTTIoer11.java:446) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.T4C8Oall.processError(T4C8Oall.java:1052) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.T4CTTIfun.receive(T4CTTIfun.java:537) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.T4CTTIfun.doRPC(T4CTTIfun.java:255) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.T4C8Oall.doOALL(T4C8Oall.java:610) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.T4CPreparedStatement.doOall8(T4CPreparedStatement.java:253) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.T4CPreparedStatement.doOall8(T4CPreparedStatement.java:86) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.T4CPreparedStatement.executeForRows(T4CPreparedStatement.java:928) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.OracleStatement.doExecuteWithTimeout(OracleStatement.java:1136) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.OraclePreparedStatement.executeInternal(OraclePreparedStatement.java:3640) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.T4CPreparedStatement.executeInternal(T4CPreparedStatement.java:1384) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.OraclePreparedStatement.executeLargeUpdate(OraclePreparedStatement.java:3730) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.OraclePreparedStatement.executeUpdate(OraclePreparedStatement.java:3710) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.OraclePreparedStatementWrapper.executeUpdate(OraclePreparedStatementWrapper.java:1061) ~[ojdbc8.jar:18.3.0.0.0]
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61) ~[HikariCP-3.2.0.jar:?]
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java) ~[HikariCP-3.2.0.jar:?]
+	at org.springframework.jdbc.core.JdbcTemplate.lambda$update$0(JdbcTemplate.java:866) ~[spring-jdbc-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:616) ~[spring-jdbc-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:861) ~[spring-jdbc-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:916) ~[spring-jdbc-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:921) ~[spring-jdbc-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.batch.core.repository.dao.JdbcJobInstanceDao.createJobInstance(JdbcJobInstanceDao.java:117) ~[spring-batch-core-4.1.2.RELEASE.jar:4.1.2.RELEASE]
+	at org.springframework.batch.core.repository.support.SimpleJobRepository.createJobExecution(SimpleJobRepository.java:141) ~[spring-batch-core-4.1.2.RELEASE.jar:4.1.2.RELEASE]
+	at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:?]
+	at jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[?:?]
+	at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:?]
+	at java.lang.reflect.Method.invoke(Method.java:566) ~[?:?]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:198) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:294) ~[spring-tx-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:98) ~[spring-tx-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.batch.core.repository.support.AbstractJobRepositoryFactoryBean$1.invoke(AbstractJobRepositoryFactoryBean.java:181) ~[spring-batch-core-4.1.2.RELEASE.jar:4.1.2.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:212) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at com.sun.proxy.$Proxy63.createJobExecution(Unknown Source) ~[?:?]
+	at org.springframework.batch.core.launch.support.SimpleJobLauncher.run(SimpleJobLauncher.java:134) ~[spring-batch-core-4.1.2.RELEASE.jar:4.1.2.RELEASE]
+	at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:?]
+	at jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[?:?]
+	at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:?]
+	at java.lang.reflect.Method.invoke(Method.java:566) ~[?:?]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:198) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.batch.core.configuration.annotation.SimpleBatchConfiguration$PassthruAdvice.invoke(SimpleBatchConfiguration.java:127) ~[spring-batch-core-4.1.2.RELEASE.jar:4.1.2.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:212) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at com.sun.proxy.$Proxy72.run(Unknown Source) ~[?:?]
+	at org.springframework.boot.autoconfigure.batch.JobLauncherCommandLineRunner.execute(JobLauncherCommandLineRunner.java:214) ~[spring-boot-autoconfigure-2.1.4.RELEASE.jar:2.1.4.RELEASE]
+	at org.springframework.boot.autoconfigure.batch.JobLauncherCommandLineRunner.executeLocalJobs(JobLauncherCommandLineRunner.java:186) ~[spring-boot-autoconfigure-2.1.4.RELEASE.jar:2.1.4.RELEASE]
+	at org.springframework.boot.autoconfigure.batch.JobLauncherCommandLineRunner.launchJobFromProperties(JobLauncherCommandLineRunner.java:172) ~[spring-boot-autoconfigure-2.1.4.RELEASE.jar:2.1.4.RELEASE]
+	at org.springframework.boot.autoconfigure.batch.JobLauncherCommandLineRunner.run(JobLauncherCommandLineRunner.java:166) ~[spring-boot-autoconfigure-2.1.4.RELEASE.jar:2.1.4.RELEASE]
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:813) ~[spring-boot-2.1.4.RELEASE.jar:2.1.4.RELEASE]
+	... 10 more
+Caused by: oracle.jdbc.OracleDatabaseException: ORA-08177: このトランザクションのアクセスをシリアル化できません
+
+	at oracle.jdbc.driver.T4CTTIoer11.processError(T4CTTIoer11.java:498) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.T4CTTIoer11.processError(T4CTTIoer11.java:446) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.T4C8Oall.processError(T4C8Oall.java:1052) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.T4CTTIfun.receive(T4CTTIfun.java:537) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.T4CTTIfun.doRPC(T4CTTIfun.java:255) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.T4C8Oall.doOALL(T4C8Oall.java:610) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.T4CPreparedStatement.doOall8(T4CPreparedStatement.java:253) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.T4CPreparedStatement.doOall8(T4CPreparedStatement.java:86) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.T4CPreparedStatement.executeForRows(T4CPreparedStatement.java:928) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.OracleStatement.doExecuteWithTimeout(OracleStatement.java:1136) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.OraclePreparedStatement.executeInternal(OraclePreparedStatement.java:3640) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.T4CPreparedStatement.executeInternal(T4CPreparedStatement.java:1384) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.OraclePreparedStatement.executeLargeUpdate(OraclePreparedStatement.java:3730) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.OraclePreparedStatement.executeUpdate(OraclePreparedStatement.java:3710) ~[ojdbc8.jar:18.3.0.0.0]
+	at oracle.jdbc.driver.OraclePreparedStatementWrapper.executeUpdate(OraclePreparedStatementWrapper.java:1061) ~[ojdbc8.jar:18.3.0.0.0]
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61) ~[HikariCP-3.2.0.jar:?]
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java) ~[HikariCP-3.2.0.jar:?]
+	at org.springframework.jdbc.core.JdbcTemplate.lambda$update$0(JdbcTemplate.java:866) ~[spring-jdbc-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:616) ~[spring-jdbc-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:861) ~[spring-jdbc-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:916) ~[spring-jdbc-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:921) ~[spring-jdbc-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.batch.core.repository.dao.JdbcJobInstanceDao.createJobInstance(JdbcJobInstanceDao.java:117) ~[spring-batch-core-4.1.2.RELEASE.jar:4.1.2.RELEASE]
+	at org.springframework.batch.core.repository.support.SimpleJobRepository.createJobExecution(SimpleJobRepository.java:141) ~[spring-batch-core-4.1.2.RELEASE.jar:4.1.2.RELEASE]
+	at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:?]
+	at jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[?:?]
+	at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:?]
+	at java.lang.reflect.Method.invoke(Method.java:566) ~[?:?]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:198) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:294) ~[spring-tx-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:98) ~[spring-tx-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.batch.core.repository.support.AbstractJobRepositoryFactoryBean$1.invoke(AbstractJobRepositoryFactoryBean.java:181) ~[spring-batch-core-4.1.2.RELEASE.jar:4.1.2.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:212) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at com.sun.proxy.$Proxy63.createJobExecution(Unknown Source) ~[?:?]
+	at org.springframework.batch.core.launch.support.SimpleJobLauncher.run(SimpleJobLauncher.java:134) ~[spring-batch-core-4.1.2.RELEASE.jar:4.1.2.RELEASE]
+	at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:?]
+	at jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[?:?]
+	at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:?]
+	at java.lang.reflect.Method.invoke(Method.java:566) ~[?:?]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:198) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.batch.core.configuration.annotation.SimpleBatchConfiguration$PassthruAdvice.invoke(SimpleBatchConfiguration.java:127) ~[spring-batch-core-4.1.2.RELEASE.jar:4.1.2.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:212) ~[spring-aop-5.1.6.RELEASE.jar:5.1.6.RELEASE]
+	at com.sun.proxy.$Proxy72.run(Unknown Source) ~[?:?]
+	at org.springframework.boot.autoconfigure.batch.JobLauncherCommandLineRunner.execute(JobLauncherCommandLineRunner.java:214) ~[spring-boot-autoconfigure-2.1.4.RELEASE.jar:2.1.4.RELEASE]
+	at org.springframework.boot.autoconfigure.batch.JobLauncherCommandLineRunner.executeLocalJobs(JobLauncherCommandLineRunner.java:186) ~[spring-boot-autoconfigure-2.1.4.RELEASE.jar:2.1.4.RELEASE]
+	at org.springframework.boot.autoconfigure.batch.JobLauncherCommandLineRunner.launchJobFromProperties(JobLauncherCommandLineRunner.java:172) ~[spring-boot-autoconfigure-2.1.4.RELEASE.jar:2.1.4.RELEASE]
+	at org.springframework.boot.autoconfigure.batch.JobLauncherCommandLineRunner.run(JobLauncherCommandLineRunner.java:166) ~[spring-boot-autoconfigure-2.1.4.RELEASE.jar:2.1.4.RELEASE]
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:813) ~[spring-boot-2.1.4.RELEASE.jar:2.1.4.RELEASE]
+	... 10 more
+
+2019-04-23 00:04:01.601  INFO 13184 --- [  restartedMain] c.z.h.HikariDataSource                   : HikariPool-1 - Shutdown initiated...
+2019-04-23 00:04:01.610  INFO 13184 --- [  restartedMain] c.z.h.HikariDataSource                   : HikariPool-1 - Shutdown completed.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@@@@@@@@ トランザクションの分離レベルを変更したもの @@@@@@@@@@@@@@
+
+
+
+### START SimpleBatchApplication
+### START SimpleBatchApplication
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::        (v2.1.4.RELEASE)
+
+2019-04-23 00:44:51.637  INFO 1712 --- [  restartedMain] c.e.s.SimpleBatchApplication             : Starting SimpleBatchApplication on DESKTOP-S7E5EAQ with PID 1712 (D:\work\git\SimpleSpringBootBatch\bin\main started by t-tak in D:\work\git\SimpleSpringBootBatch)
+2019-04-23 00:44:51.641  INFO 1712 --- [  restartedMain] c.e.s.SimpleBatchApplication             : No active profile set, falling back to default profiles: default
+2019-04-23 00:44:51.688  INFO 1712 --- [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2019-04-23 00:44:53.448  WARN 1712 --- [  restartedMain] o.s.b.c.c.a.DefaultBatchConfigurer       : No transaction manager was provided, using a DataSourceTransactionManager
+2019-04-23 00:44:53.509 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceUtils                  : Fetching JDBC Connection from DataSource
+2019-04-23 00:44:53.512  INFO 1712 --- [  restartedMain] c.z.h.HikariDataSource                   : HikariPool-1 - Starting...
+2019-04-23 00:44:54.265  INFO 1712 --- [  restartedMain] c.z.h.HikariDataSource                   : HikariPool-1 - Start completed.
+2019-04-23 00:44:54.326  INFO 1712 --- [  restartedMain] o.s.b.c.r.s.JobRepositoryFactoryBean     : No database type set, using meta data indicating: ORACLE
+2019-04-23 00:44:54.741  INFO 1712 --- [  restartedMain] o.s.b.c.l.s.SimpleJobLauncher            : No TaskExecutor has been set, defaulting to synchronous executor.
+### listener ###
+### job = executeStoredJob ###
+2019-04-23 00:44:55.570 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceUtils                  : Fetching JDBC Connection from DataSource
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.springframework.cglib.core.ReflectUtils (file:/C:/Users/t-tak/.gradle/caches/modules-2/files-2.1/org.springframework/spring-core/5.1.6.RELEASE/9329591e728ef9844911e082e399f4fc3e3ecb37/spring-core-5.1.6.RELEASE.jar) to method java.lang.ClassLoader.defineClass(java.lang.String,byte[],int,int,java.security.ProtectionDomain)
+WARNING: Please consider reporting this to the maintainers of org.springframework.cglib.core.ReflectUtils
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+2019-04-23 00:44:56.064  INFO 1712 --- [  restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2019-04-23 00:44:56.168  INFO 1712 --- [  restartedMain] c.e.s.SimpleBatchApplication             : Started SimpleBatchApplication in 5.198 seconds (JVM running for 6.84)
+2019-04-23 00:44:56.174  INFO 1712 --- [  restartedMain] o.s.b.a.b.JobLauncherCommandLineRunner   : Running default command line with: [--spring.batch.job.enabled=true, --spring.batch.job.names=executeStoredJob]
+2019-04-23 00:44:56.181 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Creating new transaction with name [org.springframework.batch.core.repository.support.SimpleJobRepository.isJobInstanceExists]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+2019-04-23 00:44:56.312 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Acquired Connection [HikariProxyConnection@649318190 wrapping oracle.jdbc.driver.T4CConnection@4730899] for JDBC transaction
+2019-04-23 00:44:56.328 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:44:56.329 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT JOB_INSTANCE_ID, JOB_NAME from BATCH_JOB_INSTANCE where JOB_NAME = ? and JOB_KEY = ?]
+2019-04-23 00:44:56.580 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Initiating transaction commit
+2019-04-23 00:44:56.580 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Committing JDBC transaction on Connection [HikariProxyConnection@649318190 wrapping oracle.jdbc.driver.T4CConnection@4730899]
+2019-04-23 00:44:56.582 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Releasing JDBC Connection [HikariProxyConnection@649318190 wrapping oracle.jdbc.driver.T4CConnection@4730899] after transaction
+2019-04-23 00:44:56.582 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:44:56.583 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT JOB_INSTANCE_ID, JOB_NAME from BATCH_JOB_INSTANCE where JOB_NAME = ? order by JOB_INSTANCE_ID desc]
+2019-04-23 00:44:56.583 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceUtils                  : Fetching JDBC Connection from DataSource
+2019-04-23 00:44:56.586 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:44:56.586 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED, VERSION, JOB_CONFIGURATION_LOCATION from BATCH_JOB_EXECUTION where JOB_INSTANCE_ID = ? order by JOB_EXECUTION_ID desc]
+2019-04-23 00:44:56.587 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceUtils                  : Fetching JDBC Connection from DataSource
+2019-04-23 00:44:56.592 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:44:56.592 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT JOB_EXECUTION_ID, KEY_NAME, TYPE_CD, STRING_VAL, DATE_VAL, LONG_VAL, DOUBLE_VAL, IDENTIFYING from BATCH_JOB_EXECUTION_PARAMS where JOB_EXECUTION_ID = ?]
+2019-04-23 00:44:56.592 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceUtils                  : Fetching JDBC Connection from DataSource
+2019-04-23 00:44:56.598 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:44:56.599 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT ji.JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, ji.VERSION from BATCH_JOB_INSTANCE ji, BATCH_JOB_EXECUTION je where JOB_EXECUTION_ID = ? and ji.JOB_INSTANCE_ID = je.JOB_INSTANCE_ID]
+2019-04-23 00:44:56.599 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceUtils                  : Fetching JDBC Connection from DataSource
+2019-04-23 00:44:56.601 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:44:56.601 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT STEP_EXECUTION_ID, STEP_NAME, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, VERSION from BATCH_STEP_EXECUTION where JOB_EXECUTION_ID = ? order by STEP_EXECUTION_ID]
+2019-04-23 00:44:56.601 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceUtils                  : Fetching JDBC Connection from DataSource
+2019-04-23 00:44:56.604 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:44:56.604 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT SHORT_CONTEXT, SERIALIZED_CONTEXT FROM BATCH_JOB_EXECUTION_CONTEXT WHERE JOB_EXECUTION_ID = ?]
+2019-04-23 00:44:56.604 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceUtils                  : Fetching JDBC Connection from DataSource
+2019-04-23 00:44:56.647 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:44:56.647 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT SHORT_CONTEXT, SERIALIZED_CONTEXT FROM BATCH_STEP_EXECUTION_CONTEXT WHERE STEP_EXECUTION_ID = ?]
+2019-04-23 00:44:56.647 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceUtils                  : Fetching JDBC Connection from DataSource
+2019-04-23 00:44:56.651 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Creating new transaction with name [org.springframework.batch.core.repository.support.SimpleJobRepository.getLastJobExecution]: PROPAGATION_REQUIRES_NEW,ISOLATION_READ_COMMITTED
+2019-04-23 00:44:56.651 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Acquired Connection [HikariProxyConnection@1108066311 wrapping oracle.jdbc.driver.T4CConnection@4730899] for JDBC transaction
+2019-04-23 00:44:56.651 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceUtils                  : Changing isolation level of JDBC Connection [HikariProxyConnection@1108066311 wrapping oracle.jdbc.driver.T4CConnection@4730899] to 2
+2019-04-23 00:44:56.652 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:44:56.652 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT JOB_INSTANCE_ID, JOB_NAME from BATCH_JOB_INSTANCE where JOB_NAME = ? and JOB_KEY = ?]
+2019-04-23 00:44:56.653 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Initiating transaction commit
+2019-04-23 00:44:56.653 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Committing JDBC transaction on Connection [HikariProxyConnection@1108066311 wrapping oracle.jdbc.driver.T4CConnection@4730899]
+2019-04-23 00:44:56.653 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Releasing JDBC Connection [HikariProxyConnection@1108066311 wrapping oracle.jdbc.driver.T4CConnection@4730899] after transaction
+2019-04-23 00:44:56.654 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Creating new transaction with name [org.springframework.batch.core.repository.support.SimpleJobRepository.createJobExecution]: PROPAGATION_REQUIRES_NEW,ISOLATION_READ_COMMITTED
+2019-04-23 00:44:56.654 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Acquired Connection [HikariProxyConnection@12743956 wrapping oracle.jdbc.driver.T4CConnection@4730899] for JDBC transaction
+2019-04-23 00:44:56.654 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceUtils                  : Changing isolation level of JDBC Connection [HikariProxyConnection@12743956 wrapping oracle.jdbc.driver.T4CConnection@4730899] to 2
+2019-04-23 00:44:56.654 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:44:56.655 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT JOB_INSTANCE_ID, JOB_NAME from BATCH_JOB_INSTANCE where JOB_NAME = ? and JOB_KEY = ?]
+2019-04-23 00:44:56.656 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:44:56.656 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT JOB_INSTANCE_ID, JOB_NAME from BATCH_JOB_INSTANCE where JOB_NAME = ? and JOB_KEY = ?]
+2019-04-23 00:44:56.661 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL update
+2019-04-23 00:44:56.662 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [INSERT into BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION) values (?, ?, ?, ?)]
+2019-04-23 00:44:56.664 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL update
+2019-04-23 00:44:56.665 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [INSERT into BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED, JOB_CONFIGURATION_LOCATION) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+2019-04-23 00:44:56.667 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL update
+2019-04-23 00:44:56.667 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [INSERT into BATCH_JOB_EXECUTION_PARAMS(JOB_EXECUTION_ID, KEY_NAME, TYPE_CD, STRING_VAL, DATE_VAL, LONG_VAL, DOUBLE_VAL, IDENTIFYING) values (?, ?, ?, ?, ?, ?, ?, ?)]
+2019-04-23 00:44:56.668 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL update
+2019-04-23 00:44:56.668 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [INSERT into BATCH_JOB_EXECUTION_PARAMS(JOB_EXECUTION_ID, KEY_NAME, TYPE_CD, STRING_VAL, DATE_VAL, LONG_VAL, DOUBLE_VAL, IDENTIFYING) values (?, ?, ?, ?, ?, ?, ?, ?)]
+2019-04-23 00:44:56.669 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL update
+2019-04-23 00:44:56.670 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [INSERT into BATCH_JOB_EXECUTION_PARAMS(JOB_EXECUTION_ID, KEY_NAME, TYPE_CD, STRING_VAL, DATE_VAL, LONG_VAL, DOUBLE_VAL, IDENTIFYING) values (?, ?, ?, ?, ?, ?, ?, ?)]
+2019-04-23 00:44:56.680 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL update
+2019-04-23 00:44:56.680 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [INSERT INTO BATCH_JOB_EXECUTION_CONTEXT (SHORT_CONTEXT, SERIALIZED_CONTEXT, JOB_EXECUTION_ID) VALUES(?, ?, ?)]
+2019-04-23 00:44:56.682 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Initiating transaction commit
+2019-04-23 00:44:56.682 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Committing JDBC transaction on Connection [HikariProxyConnection@12743956 wrapping oracle.jdbc.driver.T4CConnection@4730899]
+2019-04-23 00:44:56.683 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Releasing JDBC Connection [HikariProxyConnection@12743956 wrapping oracle.jdbc.driver.T4CConnection@4730899] after transaction
+2019-04-23 00:44:56.684  INFO 1712 --- [  restartedMain] o.s.b.c.l.s.SimpleJobLauncher            : Job: [SimpleJob: [name=executeStoredJob]] launched with the following parameters: [{-spring.batch.job.enabled=true, run.id=4, -spring.batch.job.names=executeStoredJob}]
+2019-04-23 00:44:56.687 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Creating new transaction with name [org.springframework.batch.core.repository.support.SimpleJobRepository.update]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+2019-04-23 00:44:56.687 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Acquired Connection [HikariProxyConnection@1430790602 wrapping oracle.jdbc.driver.T4CConnection@4730899] for JDBC transaction
+2019-04-23 00:44:56.689 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:44:56.689 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT VERSION FROM BATCH_JOB_EXECUTION WHERE JOB_EXECUTION_ID=?]
+2019-04-23 00:44:56.692 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:44:56.692 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT COUNT(*) FROM BATCH_JOB_EXECUTION WHERE JOB_EXECUTION_ID = ?]
+2019-04-23 00:44:56.694 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL update
+2019-04-23 00:44:56.694 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [UPDATE BATCH_JOB_EXECUTION set START_TIME = ?, END_TIME = ?,  STATUS = ?, EXIT_CODE = ?, EXIT_MESSAGE = ?, VERSION = ?, CREATE_TIME = ?, LAST_UPDATED = ? where JOB_EXECUTION_ID = ? and VERSION = ?]
+2019-04-23 00:44:56.695 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Initiating transaction commit
+2019-04-23 00:44:56.695 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Committing JDBC transaction on Connection [HikariProxyConnection@1430790602 wrapping oracle.jdbc.driver.T4CConnection@4730899]
+2019-04-23 00:44:56.696 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Releasing JDBC Connection [HikariProxyConnection@1430790602 wrapping oracle.jdbc.driver.T4CConnection@4730899] after transaction
+### START job ###
+2019-04-23 00:44:56.697 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Creating new transaction with name [org.springframework.batch.core.repository.support.SimpleJobRepository.getLastStepExecution]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+2019-04-23 00:44:56.697 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Acquired Connection [HikariProxyConnection@1424867425 wrapping oracle.jdbc.driver.T4CConnection@4730899] for JDBC transaction
+2019-04-23 00:44:56.697 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:44:56.697 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED, VERSION, JOB_CONFIGURATION_LOCATION from BATCH_JOB_EXECUTION where JOB_INSTANCE_ID = ? order by JOB_EXECUTION_ID desc]
+2019-04-23 00:44:56.698 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:44:56.699 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT JOB_EXECUTION_ID, KEY_NAME, TYPE_CD, STRING_VAL, DATE_VAL, LONG_VAL, DOUBLE_VAL, IDENTIFYING from BATCH_JOB_EXECUTION_PARAMS where JOB_EXECUTION_ID = ?]
+2019-04-23 00:44:56.700 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:44:56.701 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT STEP_EXECUTION_ID, STEP_NAME, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, VERSION from BATCH_STEP_EXECUTION where JOB_EXECUTION_ID = ? order by STEP_EXECUTION_ID]
+2019-04-23 00:44:56.702 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Initiating transaction commit
+2019-04-23 00:44:56.702 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Committing JDBC transaction on Connection [HikariProxyConnection@1424867425 wrapping oracle.jdbc.driver.T4CConnection@4730899]
+2019-04-23 00:44:56.703 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Releasing JDBC Connection [HikariProxyConnection@1424867425 wrapping oracle.jdbc.driver.T4CConnection@4730899] after transaction
+2019-04-23 00:44:56.703 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Creating new transaction with name [org.springframework.batch.core.repository.support.SimpleJobRepository.getStepExecutionCount]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+2019-04-23 00:44:56.703 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Acquired Connection [HikariProxyConnection@1483125521 wrapping oracle.jdbc.driver.T4CConnection@4730899] for JDBC transaction
+2019-04-23 00:44:56.704 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:44:56.704 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED, VERSION, JOB_CONFIGURATION_LOCATION from BATCH_JOB_EXECUTION where JOB_INSTANCE_ID = ? order by JOB_EXECUTION_ID desc]
+2019-04-23 00:44:56.705 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:44:56.705 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT JOB_EXECUTION_ID, KEY_NAME, TYPE_CD, STRING_VAL, DATE_VAL, LONG_VAL, DOUBLE_VAL, IDENTIFYING from BATCH_JOB_EXECUTION_PARAMS where JOB_EXECUTION_ID = ?]
+2019-04-23 00:44:56.707 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:44:56.707 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT STEP_EXECUTION_ID, STEP_NAME, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, VERSION from BATCH_STEP_EXECUTION where JOB_EXECUTION_ID = ? order by STEP_EXECUTION_ID]
+2019-04-23 00:44:56.711 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Initiating transaction commit
+2019-04-23 00:44:56.711 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Committing JDBC transaction on Connection [HikariProxyConnection@1483125521 wrapping oracle.jdbc.driver.T4CConnection@4730899]
+2019-04-23 00:44:56.712 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Releasing JDBC Connection [HikariProxyConnection@1483125521 wrapping oracle.jdbc.driver.T4CConnection@4730899] after transaction
+2019-04-23 00:44:56.713 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Creating new transaction with name [org.springframework.batch.core.repository.support.SimpleJobRepository.add]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+2019-04-23 00:44:56.713 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Acquired Connection [HikariProxyConnection@1998183817 wrapping oracle.jdbc.driver.T4CConnection@4730899] for JDBC transaction
+2019-04-23 00:44:56.714 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL update
+2019-04-23 00:44:56.714 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [INSERT into BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+2019-04-23 00:44:56.716 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL update
+2019-04-23 00:44:56.716 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [INSERT INTO BATCH_STEP_EXECUTION_CONTEXT (SHORT_CONTEXT, SERIALIZED_CONTEXT, STEP_EXECUTION_ID) VALUES(?, ?, ?)]
+2019-04-23 00:44:56.717 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Initiating transaction commit
+2019-04-23 00:44:56.718 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Committing JDBC transaction on Connection [HikariProxyConnection@1998183817 wrapping oracle.jdbc.driver.T4CConnection@4730899]
+2019-04-23 00:44:56.718 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Releasing JDBC Connection [HikariProxyConnection@1998183817 wrapping oracle.jdbc.driver.T4CConnection@4730899] after transaction
+2019-04-23 00:44:56.719  INFO 1712 --- [  restartedMain] o.s.b.c.j.SimpleStepHandler              : Executing step: [defaultJobStep]
+2019-04-23 00:44:56.719 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Creating new transaction with name [org.springframework.batch.core.repository.support.SimpleJobRepository.update]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+2019-04-23 00:44:56.720 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Acquired Connection [HikariProxyConnection@551434576 wrapping oracle.jdbc.driver.T4CConnection@4730899] for JDBC transaction
+2019-04-23 00:44:56.720 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL update
+2019-04-23 00:44:56.720 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [UPDATE BATCH_STEP_EXECUTION set START_TIME = ?, END_TIME = ?, STATUS = ?, COMMIT_COUNT = ?, READ_COUNT = ?, FILTER_COUNT = ?, WRITE_COUNT = ?, EXIT_CODE = ?, EXIT_MESSAGE = ?, VERSION = ?, READ_SKIP_COUNT = ?, PROCESS_SKIP_COUNT = ?, WRITE_SKIP_COUNT = ?, ROLLBACK_COUNT = ?, LAST_UPDATED = ? where STEP_EXECUTION_ID = ? and VERSION = ?]
+2019-04-23 00:44:56.721 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:44:56.722 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT VERSION FROM BATCH_JOB_EXECUTION WHERE JOB_EXECUTION_ID=?]
+2019-04-23 00:44:56.722 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Initiating transaction commit
+2019-04-23 00:44:56.723 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Committing JDBC transaction on Connection [HikariProxyConnection@551434576 wrapping oracle.jdbc.driver.T4CConnection@4730899]
+2019-04-23 00:44:56.723 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Releasing JDBC Connection [HikariProxyConnection@551434576 wrapping oracle.jdbc.driver.T4CConnection@4730899] after transaction
+2019-04-23 00:44:56.725 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Creating new transaction with name [org.springframework.batch.core.repository.support.SimpleJobRepository.updateExecutionContext]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+2019-04-23 00:44:56.726 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Acquired Connection [HikariProxyConnection@537302997 wrapping oracle.jdbc.driver.T4CConnection@4730899] for JDBC transaction
+2019-04-23 00:44:56.728 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL update
+2019-04-23 00:44:56.728 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [UPDATE BATCH_STEP_EXECUTION_CONTEXT SET SHORT_CONTEXT = ?, SERIALIZED_CONTEXT = ? WHERE STEP_EXECUTION_ID = ?]
+2019-04-23 00:44:56.730 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Initiating transaction commit
+2019-04-23 00:44:56.731 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Committing JDBC transaction on Connection [HikariProxyConnection@537302997 wrapping oracle.jdbc.driver.T4CConnection@4730899]
+2019-04-23 00:44:56.733 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Releasing JDBC Connection [HikariProxyConnection@537302997 wrapping oracle.jdbc.driver.T4CConnection@4730899] after transaction
+2019-04-23 00:44:56.738 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Creating new transaction with name [null]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+2019-04-23 00:44:56.738 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Acquired Connection [HikariProxyConnection@304922150 wrapping oracle.jdbc.driver.T4CConnection@4730899] for JDBC transaction
+2019-04-23 00:44:56.740 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Suspending current transaction, creating new transaction with name [com.example.ssbb.tasklet.ExecuteStoredTasklet$$EnhancerBySpringCGLIB$$230aa8fb.execute]
+2019-04-23 00:44:56.741 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Acquired Connection [HikariProxyConnection@1066350338 wrapping oracle.jdbc.driver.T4CConnection@70b8f59d] for JDBC transaction
+### param = MyFunctestParam [rc=null, in1=20190423004456756, out1=null, out2=null]
+### result = MyFunctestParam [rc=0, in1=20190423004456756, out1=13, out2=INSERT MYTBL (20190423004456756,from MYFUNCTEST,14)]
+2019-04-23 00:44:56.816 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Initiating transaction commit
+2019-04-23 00:44:56.816 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Committing JDBC transaction on Connection [HikariProxyConnection@1066350338 wrapping oracle.jdbc.driver.T4CConnection@70b8f59d]
+2019-04-23 00:44:56.817 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Releasing JDBC Connection [HikariProxyConnection@1066350338 wrapping oracle.jdbc.driver.T4CConnection@70b8f59d] after transaction
+2019-04-23 00:44:56.817 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Resuming suspended transaction after completion of inner transaction
+2019-04-23 00:44:56.818 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Participating in existing transaction
+2019-04-23 00:44:56.818 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL update
+2019-04-23 00:44:56.818 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [UPDATE BATCH_STEP_EXECUTION_CONTEXT SET SHORT_CONTEXT = ?, SERIALIZED_CONTEXT = ? WHERE STEP_EXECUTION_ID = ?]
+2019-04-23 00:44:56.819 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Participating in existing transaction
+2019-04-23 00:44:56.819 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL update
+2019-04-23 00:44:56.819 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [UPDATE BATCH_STEP_EXECUTION set START_TIME = ?, END_TIME = ?, STATUS = ?, COMMIT_COUNT = ?, READ_COUNT = ?, FILTER_COUNT = ?, WRITE_COUNT = ?, EXIT_CODE = ?, EXIT_MESSAGE = ?, VERSION = ?, READ_SKIP_COUNT = ?, PROCESS_SKIP_COUNT = ?, WRITE_SKIP_COUNT = ?, ROLLBACK_COUNT = ?, LAST_UPDATED = ? where STEP_EXECUTION_ID = ? and VERSION = ?]
+2019-04-23 00:44:56.820 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:44:56.820 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT VERSION FROM BATCH_JOB_EXECUTION WHERE JOB_EXECUTION_ID=?]
+2019-04-23 00:44:56.822 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Initiating transaction commit
+2019-04-23 00:44:56.822 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Committing JDBC transaction on Connection [HikariProxyConnection@304922150 wrapping oracle.jdbc.driver.T4CConnection@4730899]
+2019-04-23 00:44:56.822 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Releasing JDBC Connection [HikariProxyConnection@304922150 wrapping oracle.jdbc.driver.T4CConnection@4730899] after transaction
+2019-04-23 00:44:56.823 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Creating new transaction with name [org.springframework.batch.core.repository.support.SimpleJobRepository.updateExecutionContext]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+2019-04-23 00:44:56.823 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Acquired Connection [HikariProxyConnection@896366245 wrapping oracle.jdbc.driver.T4CConnection@4730899] for JDBC transaction
+2019-04-23 00:44:56.823 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL update
+2019-04-23 00:44:56.823 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [UPDATE BATCH_STEP_EXECUTION_CONTEXT SET SHORT_CONTEXT = ?, SERIALIZED_CONTEXT = ? WHERE STEP_EXECUTION_ID = ?]
+2019-04-23 00:44:56.824 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Initiating transaction commit
+2019-04-23 00:44:56.825 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Committing JDBC transaction on Connection [HikariProxyConnection@896366245 wrapping oracle.jdbc.driver.T4CConnection@4730899]
+2019-04-23 00:44:56.825 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Releasing JDBC Connection [HikariProxyConnection@896366245 wrapping oracle.jdbc.driver.T4CConnection@4730899] after transaction
+2019-04-23 00:44:56.826 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Creating new transaction with name [org.springframework.batch.core.repository.support.SimpleJobRepository.update]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+2019-04-23 00:44:56.826 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Acquired Connection [HikariProxyConnection@1752215491 wrapping oracle.jdbc.driver.T4CConnection@4730899] for JDBC transaction
+2019-04-23 00:44:56.826 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL update
+2019-04-23 00:44:56.826 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [UPDATE BATCH_STEP_EXECUTION set START_TIME = ?, END_TIME = ?, STATUS = ?, COMMIT_COUNT = ?, READ_COUNT = ?, FILTER_COUNT = ?, WRITE_COUNT = ?, EXIT_CODE = ?, EXIT_MESSAGE = ?, VERSION = ?, READ_SKIP_COUNT = ?, PROCESS_SKIP_COUNT = ?, WRITE_SKIP_COUNT = ?, ROLLBACK_COUNT = ?, LAST_UPDATED = ? where STEP_EXECUTION_ID = ? and VERSION = ?]
+2019-04-23 00:44:56.827 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:44:56.827 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT VERSION FROM BATCH_JOB_EXECUTION WHERE JOB_EXECUTION_ID=?]
+2019-04-23 00:44:56.828 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Initiating transaction commit
+2019-04-23 00:44:56.829 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Committing JDBC transaction on Connection [HikariProxyConnection@1752215491 wrapping oracle.jdbc.driver.T4CConnection@4730899]
+2019-04-23 00:44:56.829 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Releasing JDBC Connection [HikariProxyConnection@1752215491 wrapping oracle.jdbc.driver.T4CConnection@4730899] after transaction
+2019-04-23 00:44:56.830 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Creating new transaction with name [org.springframework.batch.core.repository.support.SimpleJobRepository.updateExecutionContext]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+2019-04-23 00:44:56.830 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Acquired Connection [HikariProxyConnection@1400731688 wrapping oracle.jdbc.driver.T4CConnection@4730899] for JDBC transaction
+2019-04-23 00:44:56.830 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL update
+2019-04-23 00:44:56.830 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [UPDATE BATCH_JOB_EXECUTION_CONTEXT SET SHORT_CONTEXT = ?, SERIALIZED_CONTEXT = ? WHERE JOB_EXECUTION_ID = ?]
+2019-04-23 00:44:56.831 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Initiating transaction commit
+2019-04-23 00:44:56.831 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Committing JDBC transaction on Connection [HikariProxyConnection@1400731688 wrapping oracle.jdbc.driver.T4CConnection@4730899]
+2019-04-23 00:44:56.832 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Releasing JDBC Connection [HikariProxyConnection@1400731688 wrapping oracle.jdbc.driver.T4CConnection@4730899] after transaction
+### END  job ###
+2019-04-23 00:44:56.832 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Creating new transaction with name [org.springframework.batch.core.repository.support.SimpleJobRepository.update]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+2019-04-23 00:44:56.832 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Acquired Connection [HikariProxyConnection@1654452413 wrapping oracle.jdbc.driver.T4CConnection@4730899] for JDBC transaction
+2019-04-23 00:44:56.832 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:44:56.832 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT VERSION FROM BATCH_JOB_EXECUTION WHERE JOB_EXECUTION_ID=?]
+2019-04-23 00:44:56.833 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL query
+2019-04-23 00:44:56.833 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [SELECT COUNT(*) FROM BATCH_JOB_EXECUTION WHERE JOB_EXECUTION_ID = ?]
+2019-04-23 00:44:56.834 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL update
+2019-04-23 00:44:56.834 DEBUG 1712 --- [  restartedMain] o.s.j.c.JdbcTemplate                     : Executing prepared SQL statement [UPDATE BATCH_JOB_EXECUTION set START_TIME = ?, END_TIME = ?,  STATUS = ?, EXIT_CODE = ?, EXIT_MESSAGE = ?, VERSION = ?, CREATE_TIME = ?, LAST_UPDATED = ? where JOB_EXECUTION_ID = ? and VERSION = ?]
+2019-04-23 00:44:56.835 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Initiating transaction commit
+2019-04-23 00:44:56.835 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Committing JDBC transaction on Connection [HikariProxyConnection@1654452413 wrapping oracle.jdbc.driver.T4CConnection@4730899]
+2019-04-23 00:44:56.836 DEBUG 1712 --- [  restartedMain] o.s.j.d.DataSourceTransactionManager     : Releasing JDBC Connection [HikariProxyConnection@1654452413 wrapping oracle.jdbc.driver.T4CConnection@4730899] after transaction
+2019-04-23 00:44:56.836  INFO 1712 --- [  restartedMain] o.s.b.c.l.s.SimpleJobLauncher            : Job: [SimpleJob: [name=executeStoredJob]] completed with the following parameters: [{-spring.batch.job.enabled=true, run.id=4, -spring.batch.job.names=executeStoredJob}] and the following status: [COMPLETED]
+2019-04-23 00:44:56.954  INFO 1712 --- [      Thread-11] c.z.h.HikariDataSource                   : HikariPool-1 - Shutdown initiated...
+2019-04-23 00:44:56.972  INFO 1712 --- [      Thread-11] c.z.h.HikariDataSource                   : HikariPool-1 - Shutdown completed.

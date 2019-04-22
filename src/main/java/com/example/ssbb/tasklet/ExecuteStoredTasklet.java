@@ -3,13 +3,13 @@ package com.example.ssbb.tasklet;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import javax.transaction.Transactional;
-
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.ssbb.common.tasklet.AbstractBaseTasklet;
 import com.example.ssbb.mapper.MyFuncTestMapper;
@@ -26,7 +26,7 @@ public class ExecuteStoredTasklet extends AbstractBaseTasklet {
 	 * (note)
 	 *   トランザクションはタスクレット内で閉じています。
 	 */
-	@Transactional
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
