@@ -4,10 +4,8 @@ debug: false
 # ロガー設定
 logging:
   level:
-    org:
-      springframework:
-        web: debug
-        jdbc: debug
+    org.springframework: INFO
+    org.springframework.jdbc: DEBUG
 
 illegal-access: debug
 
